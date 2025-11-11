@@ -1,0 +1,1451 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tajwid Learning</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --primary: #0ea5e9;
+            --secondary: #06b6d4;
+            --accent: #f43f5e;
+            --success: #22c55e;
+            --warning: #eab308;
+            --dark: #0f172a;
+            --gray: #64748b;
+            --light: #f1f5f9;
+        }
+        
+        body {
+            font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+            background: #0f172a;
+            color: #e2e8f0;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+        
+        /* Animated Grid Background */
+        .grid-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(14, 165, 233, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(14, 165, 233, 0.05) 1px, transparent 1px);
+            background-size: 50px 50px;
+            animation: gridMove 20s linear infinite;
+            z-index: -1;
+        }
+        
+        @keyframes gridMove {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(50px, 50px); }
+        }
+        
+        /* Glowing orbs */
+        .orb {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(100px);
+            opacity: 0.4;
+            z-index: -1;
+            animation: float 15s ease-in-out infinite;
+        }
+        
+        .orb-1 {
+            width: 400px;
+            height: 400px;
+            background: linear-gradient(135deg, #0ea5e9, #06b6d4);
+            top: -100px;
+            left: -100px;
+            animation-delay: 0s;
+        }
+        
+        .orb-2 {
+            width: 350px;
+            height: 350px;
+            background: linear-gradient(135deg, #f43f5e, #ec4899);
+            bottom: -100px;
+            right: -100px;
+            animation-delay: 7s;
+        }
+        
+        .orb-3 {
+            width: 300px;
+            height: 300px;
+            background: linear-gradient(135deg, #8b5cf6, #6366f1);
+            top: 50%;
+            left: 50%;
+            animation-delay: 14s;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            33% { transform: translate(50px, -50px) rotate(120deg); }
+            66% { transform: translate(-30px, 30px) rotate(240deg); }
+        }
+        
+        /* Sidebar Navigation */
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            height: 100vh;
+            width: 280px;
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(20px);
+            border-right: 1px solid rgba(148, 163, 184, 0.1);
+            padding: 2rem 0;
+            z-index: 100;
+            transition: transform 0.3s ease;
+        }
+        
+        .sidebar-header {
+            padding: 0 2rem 2rem;
+            border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #0ea5e9, #06b6d4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .logo-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #0ea5e9, #06b6d4);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            box-shadow: 0 4px 20px rgba(14, 165, 233, 0.3);
+        }
+        
+        .nav-menu {
+            padding: 2rem 0;
+            list-style: none;
+        }
+        
+        .nav-item {
+            margin: 0.5rem 1rem;
+        }
+        
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem 1.5rem;
+            color: #94a3b8;
+            text-decoration: none;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .nav-link::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(180deg, #0ea5e9, #06b6d4);
+            transform: scaleY(0);
+            transition: transform 0.3s ease;
+        }
+        
+        .nav-link:hover {
+            background: rgba(14, 165, 233, 0.1);
+            color: #0ea5e9;
+            transform: translateX(5px);
+        }
+        
+        .nav-link:hover::before {
+            transform: scaleY(1);
+        }
+        
+        .nav-icon {
+            font-size: 1.2rem;
+        }
+        
+        /* Mobile Menu Toggle */
+        .menu-toggle {
+            display: none;
+            position: fixed;
+            top: 1.5rem;
+            left: 1.5rem;
+            z-index: 101;
+            width: 50px;
+            height: 50px;
+            background: rgba(14, 165, 233, 0.2);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(14, 165, 233, 0.3);
+            border-radius: 12px;
+            cursor: pointer;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .menu-toggle span {
+            width: 24px;
+            height: 2px;
+            background: #0ea5e9;
+            border-radius: 2px;
+            transition: all 0.3s ease;
+        }
+        
+        /* Main Content */
+        .main-content {
+            margin-left: 280px;
+            padding: 3rem;
+            min-height: 100vh;
+        }
+        
+        /* Hero Section */
+        .hero {
+            text-align: center;
+            padding: 4rem 0 6rem;
+            position: relative;
+        }
+        
+        .hero-badge {
+            display: inline-block;
+            padding: 0.5rem 1.5rem;
+            background: rgba(14, 165, 233, 0.1);
+            border: 1px solid rgba(14, 165, 233, 0.3);
+            border-radius: 50px;
+            color: #0ea5e9;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 2rem;
+            animation: fadeInDown 0.8s ease;
+        }
+        
+        .hero h1 {
+            font-size: 4rem;
+            font-weight: 800;
+            line-height: 1.2;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(135deg, #ffffff, #94a3b8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: fadeInUp 0.8s ease 0.2s both;
+        }
+        
+        .hero p {
+            font-size: 1.3rem;
+            color: #94a3b8;
+            max-width: 600px;
+            margin: 0 auto 3rem;
+            animation: fadeInUp 0.8s ease 0.4s both;
+        }
+        
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* Cards Grid */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+        
+        .card {
+            background: rgba(30, 41, 59, 0.5);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(148, 163, 184, 0.1);
+            border-radius: 20px;
+            padding: 2rem;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #0ea5e9, #06b6d4);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-10px);
+            border-color: rgba(14, 165, 233, 0.3);
+            box-shadow: 0 20px 60px rgba(14, 165, 233, 0.2);
+        }
+        
+        .card:hover::before {
+            transform: scaleX(1);
+        }
+        
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .card-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            background: rgba(14, 165, 233, 0.1);
+            border: 1px solid rgba(14, 165, 233, 0.3);
+        }
+        
+        .card-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #f1f5f9;
+        }
+        
+        /* Section */
+        .section {
+            margin-bottom: 4rem;
+        }
+        
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+        
+        .section-number {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #0ea5e9, #06b6d4);
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            font-weight: 800;
+            box-shadow: 0 10px 30px rgba(14, 165, 233, 0.3);
+        }
+        
+        .section-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #f1f5f9;
+        }
+        
+        /* Hukum Item */
+        .hukum-item {
+            background: rgba(30, 41, 59, 0.5);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(148, 163, 184, 0.1);
+            border-radius: 20px;
+            padding: 2.5rem;
+            margin-bottom: 2rem;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .hukum-item::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 200px;
+            height: 200px;
+            background: radial-gradient(circle, rgba(14, 165, 233, 0.1) 0%, transparent 70%);
+            transform: translate(50%, -50%);
+            pointer-events: none;
+        }
+        
+        .hukum-item:hover {
+            border-color: rgba(14, 165, 233, 0.3);
+            transform: scale(1.02);
+        }
+        
+        .hukum-header {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .hukum-badge {
+            padding: 0.5rem 1.5rem;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .badge-idzhar {
+            background: linear-gradient(135deg, #1e293b, #334155);
+            color: #f1f5f9;
+        }
+        
+        .badge-idgham {
+            background: linear-gradient(135deg, #f43f5e, #e11d48);
+            color: white;
+        }
+        
+        .badge-idgham-green {
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+            color: white;
+        }
+        
+        .badge-iqlab {
+            background: linear-gradient(135deg, #eab308, #ca8a04);
+            color: white;
+        }
+        
+        .badge-ikhfa {
+            background: linear-gradient(135deg, #64748b, #475569);
+            color: white;
+        }
+        
+        .hukum-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #f1f5f9;
+        }
+        
+        .info-row {
+            display: flex;
+            align-items: start;
+            gap: 1rem;
+            padding: 1.5rem;
+            background: rgba(15, 23, 42, 0.5);
+            border-radius: 15px;
+            margin: 1rem 0;
+            border-left: 3px solid #0ea5e9;
+        }
+        
+        .info-icon {
+            font-size: 1.5rem;
+            color: #0ea5e9;
+            margin-top: 2px;
+        }
+        
+        .info-content {
+            flex: 1;
+        }
+        
+        .info-label {
+            font-weight: 700;
+            color: #0ea5e9;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 0.5rem;
+        }
+        
+        .info-text {
+            color: #cbd5e1;
+            line-height: 1.8;
+        }
+        
+        /* Huruf Display */
+        .huruf-display {
+            background: linear-gradient(135deg, rgba(14, 165, 233, 0.1), rgba(6, 182, 212, 0.1));
+            border: 2px solid rgba(14, 165, 233, 0.3);
+            border-radius: 15px;
+            padding: 2.5rem;
+            text-align: center;
+            margin: 2rem 0;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .huruf-display::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(14, 165, 233, 0.1), transparent);
+            transition: left 0.5s ease;
+        }
+        
+        .huruf-display:hover::before {
+            left: 100%;
+        }
+        
+        .huruf-label {
+            font-size: 0.9rem;
+            color: #0ea5e9;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 1rem;
+        }
+        
+        .huruf-text {
+            font-size: 3rem;
+            font-weight: 700;
+            color: #f1f5f9;
+            direction: rtl;
+            letter-spacing: 0.5rem;
+        }
+        
+        /* Example Box */
+        .example-box {
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid rgba(148, 163, 184, 0.2);
+            border-radius: 15px;
+            padding: 2rem;
+            margin: 1.5rem 0;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .example-box:hover {
+            border-color: #0ea5e9;
+            box-shadow: 0 10px 40px rgba(14, 165, 233, 0.2);
+            transform: translateX(10px);
+        }
+        
+        .example-label {
+            display: inline-block;
+            padding: 0.25rem 1rem;
+            background: rgba(14, 165, 233, 0.2);
+            border-radius: 50px;
+            color: #0ea5e9;
+            font-size: 0.85rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+        
+        .example-arab {
+            font-size: 2.5rem;
+            direction: rtl;
+            color: #f1f5f9;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            line-height: 1.5;
+        }
+        
+        .example-latin {
+            color: #94a3b8;
+            font-style: italic;
+            font-size: 1.1rem;
+        }
+        
+        /* Mad Section Styles */
+        .mad-card {
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(99, 102, 241, 0.1));
+            border: 2px solid rgba(139, 92, 246, 0.3);
+            border-radius: 20px;
+            padding: 2.5rem;
+            margin: 2rem 0;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .mad-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(139, 92, 246, 0.05) 0%, transparent 70%);
+            animation: rotate 20s linear infinite;
+        }
+        
+        .mad-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #a78bfa;
+            margin-bottom: 1.5rem;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .duration-badge {
+            display: inline-block;
+            padding: 0.75rem 1.5rem;
+            background: linear-gradient(135deg, #8b5cf6, #6366f1);
+            border-radius: 50px;
+            color: white;
+            font-weight: 700;
+            margin: 0.5rem;
+            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .duration-badge:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(139, 92, 246, 0.5);
+        }
+        
+        /* Scroll Top */
+        .scroll-top {
+            position: fixed;
+            bottom: 50px;
+            right: 50px;
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, #6eaaff, #1da0e1, #266bff);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 2em;
+            text-decoration: none;
+            box-shadow: 0 15px 40px rgba(139, 92, 246, 0.5);
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        
+        .scroll-top:hover {
+            transform: translateY(-15px) scale(1.15);
+            box-shadow: 0 25px 60px rgba(139, 92, 246, 0.7);
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            
+            .sidebar.active {
+                transform: translateX(0);
+            }
+            
+            .menu-toggle {
+                display: flex;
+            }
+            
+            .main-content {
+                margin-left: 0;
+                padding: 2rem 1.5rem;
+            }
+            
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+            
+            .cards-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @media (max-width: 640px) {
+            .hero h1 {
+                font-size: 2rem;
+            }
+            
+            .hero p {
+                font-size: 1rem;
+            }
+            
+            .section-title {
+                font-size: 1.8rem;
+            }
+            
+            .huruf-text {
+                font-size: 2rem;
+            }
+            
+            .example-arab {
+                font-size: 1.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="grid-background"></div>
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+    
+    <!-- Mobile Menu Toggle -->
+    <div class="menu-toggle" id="menuToggle">
+        <span></span>
+        <span></span>
+        <span></span>
+    </div>
+    
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="logo">
+                <!-- <div class="logo-icon">📖</div> -->
+                <span>MENU</span>
+            </div>
+        </div>
+        <ul class="nav-menu">
+            <li class="nav-item">
+                <a href="#nun-sukun" class="nav-link">
+                    <span class="nav-icon">📘</span>
+                    <span>Nun Sukun & Tanwin</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#mim-sukun" class="nav-link">
+                    <span class="nav-icon">📗</span>
+                    <span>Mim Sukun</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#mad" class="nav-link">
+                    <span class="nav-icon">📙</span>
+                    <span>Hukum Mad</span>
+                </a>
+            </li>
+        </ul>
+    </aside>
+    
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Hero -->
+        <section id="hero" class="hero">
+            <div class="hero-badge">Anindya Yumna</div>
+            <h1>Mari Mengenal Tajwid!<br></h1>
+            <p>Platform pembelajaran ilmu tajwid yang interaktif, modern, dan mudah dipahami untuk semua kalangan</p>
+        </section>
+        
+        <!-- Quick Access Cards -->
+        <div class="cards-grid">
+            <a href="#nun-sukun" class="card" style="color: transparent;">
+                <div class="card-header">
+                    <div class="card-icon" style="color: #0ea5e9;">📘</div>
+                    <h3 class="card-title">Nun Sukun & Tanwin</h3>
+                </div>
+                <p style="color: #94a3b8;">Pelajari 5 hukum dasar nun sukun dan tanwin dengan contoh lengkap</p>
+            </a>
+            
+            <a href="#mim-sukun" class="card" style="color: transparent;">
+                <div class="card-header">
+                    <div class="card-icon" style="color: #22c55e;">📗</div>
+                    <h3 class="card-title">Mim Sukun</h3>
+                </div>
+                <p style="color: #94a3b8;">Pahami 3 hukum bacaan mim sukun beserta tata cara membacanya</p>
+            </a>
+            
+            <a href="#mad" class="card" style="color: transparent;"">
+                <div class="card-header">
+                    <div class="card-icon" style="color: orangered;">📙</div>
+                    <h3 class="card-title">Hukum Mad</h3>
+                </div>
+                <p style="color: #94a3b8;">Kuasai 9 jenis mad dan durasi panjang bacaan yang benar</p>
+            </a>
+        </div>
+        
+        <!-- NUN SUKUN & TANWIN -->
+        <section id="nun-sukun" class="section">
+            <div class="section-header">
+                <div class="section-number">01</div>
+                <h2 class="section-title">Hukum Nun Sukun & Tanwin</h2>
+            </div>
+            
+            <!-- IDZHAR HALQI -->
+            <div class="hukum-item">
+                <div class="hukum-header">
+                    <span class="hukum-badge badge-idzhar">Idzhar</span>
+                    <h3 class="hukum-title">Idzhar Halqi (الإظهار الحلقي)</h3>
+                </div>
+                
+                <div class="info-row">
+                    <span class="info-icon">💡</span>
+                    <div class="info-content">
+                        <div class="info-label">Definisi</div>
+                        <div class="info-text">Membaca nun sukun/tanwin dengan jelas tanpa dengung ketika bertemu 6 huruf halqi</div>
+                    </div>
+                </div>
+                
+                <div class="huruf-display">
+                    <div class="huruf-label">6 Huruf Idzhar</div>
+                    <div class="huruf-text">ء - ه - ع - ح - غ - خ</div>
+                </div>
+                
+                <div class="example-box">
+                    <span class="example-label">💡 Contoh</span>
+                    <div class="example-arab">مَنْ أَمَنَ</div>
+                    <div class="example-latin">Man aamana - bunyi "n" dibaca jelas</div>
+                </div>
+            </div>
+            
+            <!-- IDGHAM BIGHUNNAH -->
+            <div class="hukum-item">
+                <div class="hukum-header">
+                    <span class="hukum-badge badge-idgham">Idgham Bighunnah</span>
+                    <h3 class="hukum-title">Idgham Bighunnah (الإدغام بغنة)</h3>
+                </div>
+                
+                <div class="info-row">
+                    <span class="info-icon">💡</span>
+                    <div class="info-content">
+                        <div class="info-label">Definisi</div>
+                        <div class="info-text">Nun sukun/tanwin melebur ke huruf berikutnya disertai dengung</div>
+                    </div>
+                </div>
+                
+                <div class="info-row">
+                    <span class="info-icon">⏱️</span>
+                    <div class="info-content">
+                        <div class="info-label">Durasi Dengung</div>
+                        <div class="info-text">2 harakat (2 ketukan)</div>
+                    </div>
+                </div>
+                
+                <div class="huruf-display">
+                    <div class="huruf-label">4 Huruf Idgham Bighunnah</div>
+                    <div class="huruf-text">ي - ن - م - و</div>
+                </div>
+                
+                <div class="example-box">
+                    <span class="example-label">💡 Contoh</span>
+                    <div class="example-arab">مِنْ وَاحِدٍ</div>
+                    <div class="example-latin">Min waahidin - melebur dengan dengung 2 harakat</div>
+                </div>
+            </div>
+            
+            <!-- IDGHAM BILAGHUNNAH -->
+            <div class="hukum-item">
+                <div class="hukum-header">
+                    <span class="hukum-badge badge-idgham-green">Idgham Bilaghunnah</span>
+                    <h3 class="hukum-title">Idgham Bilaghunnah (الإدغام بلا غنة)</h3>
+                </div>
+                
+                <div class="info-row">
+                    <span class="info-icon">💡</span>
+                    <div class="info-content">
+                        <div class="info-label">Definisi</div>
+                        <div class="info-text">Nun sukun/tanwin melebur ke huruf berikutnya tanpa dengung</div>
+                    </div>
+                </div>
+                
+                <div class="huruf-display">
+                    <div class="huruf-label">2 Huruf Idgham Bilaghunnah</div>
+                    <div class="huruf-text">ل - ر</div>
+                </div>
+                
+                <div class="example-box">
+                    <span class="example-label">💡 Contoh</span>
+                    <div class="example-arab">هُدًى لِّلْمُتَّقِينَ</div>
+                    <div class="example-latin">Hudal lil-muttaqiin - langsung melebur tanpa dengung</div>
+                </div>
+            </div>
+            
+            <!-- IQLAB -->
+            <div class="hukum-item">
+                <div class="hukum-header">
+                    <span class="hukum-badge badge-iqlab">Iqlab</span>
+                    <h3 class="hukum-title">Iqlab (الإقلاب)</h3>
+                </div>
+                
+                <div class="info-row">
+                    <span class="info-icon">💡</span>
+                    <div class="info-content">
+                        <div class="info-label">Definisi</div>
+                        <div class="info-text">Nun sukun/tanwin berubah menjadi bunyi "m" disertai dengung</div>
+                    </div>
+                </div>
+                
+                <div class="info-row">
+                    <span class="info-icon">⏱️</span>
+                    <div class="info-content">
+                        <div class="info-label">Durasi Dengung</div>
+                        <div class="info-text">2 harakat dengan posisi bibir menutup seperti "م"</div>
+                    </div>
+                </div>
+                
+                <div class="huruf-display">
+                    <div class="huruf-label">1 Huruf Iqlab</div>
+                    <div class="huruf-text">ب</div>
+                </div>
+                
+                <div class="example-box">
+                    <span class="example-label">💡 Contoh</span>
+                    <div class="example-arab">مِنْ بَعْدِ</div>
+                    <div class="example-latin">Min ba'di → Mim ba'di - berubah jadi "m" dengan dengung</div>
+                </div>
+            </div>
+            
+            <!-- IKHFA HAQIQI -->
+            <div class="hukum-item">
+                <div class="hukum-header">
+                    <span class="hukum-badge badge-ikhfa">Ikhfa</span>
+                    <h3 class="hukum-title">Ikhfa Haqiqi (الإخفاء الحقيقي)</h3>
+                </div>
+                
+                <div class="info-row">
+                    <span class="info-icon">💡</span>
+                    <div class="info-content">
+                        <div class="info-label">Definisi</div>
+                        <div class="info-text">Nun sukun/tanwin dibaca samar (antara jelas dan melebur) dengan dengung</div>
+                    </div>
+                </div>
+                
+                <div class="info-row">
+                    <span class="info-icon">⏱️</span>
+                    <div class="info-content">
+                        <div class="info-label">Durasi Dengung</div>
+                        <div class="info-text">Suara "n" samar dengan dengung 2 harakat</div>
+                    </div>
+                </div>
+                
+                <div class="huruf-display">
+                    <div class="huruf-label">15 Huruf Ikhfa</div>
+                    <div class="huruf-text">ت - ث - ج - د - ذ - ز - س - ش - ص - ض - ط - ظ - ف - ق - ك</div>
+                </div>
+                
+                <div class="example-box">
+                    <span class="example-label">💡 Contoh</span>
+                    <div class="example-arab">مِنْ قَبْلِكُمْ</div>
+                    <div class="example-latin">Min qablikum - dibaca samar dengan dengung</div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- MIM SUKUN -->
+        <section id="mim-sukun" class="section">
+            <div class="section-header">
+                <div class="section-number">02</div>
+                <h2 class="section-title">Hukum Mim Sukun</h2>
+            </div>
+            
+            <!-- IDZHAR SYAFAWI -->
+            <div class="hukum-item">
+                <div class="hukum-header">
+                    <span class="hukum-badge badge-idzhar">Idzhar Syafawi</span>
+                    <h3 class="hukum-title">Idzhar Syafawi (الإظهار الشفوي)</h3>
+                </div>
+                
+                <div class="info-row">
+                    <span class="info-icon">💡</span>
+                    <div class="info-content">
+                        <div class="info-label">Definisi</div>
+                        <div class="info-text">Membaca mim sukun dengan jelas pada bibir</div>
+                    </div>
+                </div>
+                
+                <div class="huruf-display">
+                    <div class="huruf-label">Huruf Idzhar Syafawi</div>
+                    <div class="huruf-text"> ب dan م huruf selain</div>
+                </div> 
+                
+                <div class="example-box">
+                    <span class="example-label">💡 Contoh</span>
+                    <div class="example-arab">اَمْ جَعَلُواْ</div>
+                    <div class="example-latin">Am ja'aluu - bunyi "m" jelas terdengar</div>
+                </div>
+            </div>
+            
+            <!-- IDGHAM MIMI -->
+            <div class="hukum-item">
+                <div class="hukum-header">
+                    <span class="hukum-badge badge-idgham">Idgham Mimi</span>
+                    <h3 class="hukum-title">Idgham Mimi / Idgham Mitslain (الإدغام المثلين)</h3>
+                </div>
+                
+                <div class="info-row">
+                    <span class="info-icon">💡</span>
+                    <div class="info-content">
+                        <div class="info-label">Definisi</div>
+                        <div class="info-text">Mim sukun bertemu mim berharakat, melebur dengan dengung</div>
+                    </div>
+                </div>
+                
+                <div class="info-row">
+                    <span class="info-icon">⏱️</span>
+                    <div class="info-content">
+                        <div class="info-label">Durasi Dengung</div>
+                        <div class="info-text">2 harakat dengan tasydid (مّ)</div>
+                    </div>
+                </div>
+                
+                <div class="huruf-display">
+                    <div class="huruf-label">1 Huruf Idgham Mimi</div>
+                    <div class="huruf-text">م</div>
+                </div>
+                
+                <div class="example-box">
+                    <span class="example-label">💡 Contoh</span>
+                    <div class="example-arab">اَمْ مَنْ</div>
+                    <div class="example-latin">Ammman - melebur dengan dengung 2 harakat</div>
+                </div>
+            </div>
+            
+            <!-- IKHFA SYAFAWI -->
+            <div class="hukum-item">
+                <div class="hukum-header">
+                    <span class="hukum-badge badge-iqlab">Ikhfa Syafawi</span>
+                    <h3 class="hukum-title">Ikhfa Syafawi (الإخفاء الشفوي)</h3>
+                </div>
+                
+                <div class="info-row">
+                    <span class="info-icon">💡</span>
+                    <div class="info-content">
+                        <div class="info-label">Definisi</div>
+                        <div class="info-text">Mim sukun dibaca samar ketika bertemu huruf Ba</div>
+                    </div>
+                </div>
+                
+                <div class="info-row">
+                    <span class="info-icon">⏱️</span>
+                    <div class="info-content">
+                        <div class="info-label">Durasi Dengung</div>
+                        <div class="info-text">2 harakat, bibir hampir menutup</div>
+                    </div>
+                </div>
+                
+                <div class="huruf-display">
+                    <div class="huruf-label">1 Huruf Ikhfa Syafawi</div>
+                    <div class="huruf-text">ب</div>
+                </div>
+                
+                <div class="example-box">
+                    <span class="example-label">💡 Contoh</span>
+                    <div class="example-arab">تَرْمِيهِم بِحِجَارَةٍ</div>
+                    <div class="example-latin">Tarmiihim bi-hijaaratin - samar dengan dengung</div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- HUKUM MAD -->
+        <section id="mad" class="section">
+            <div class="section-header">
+                <div class="section-number">03</div>
+                <h2 class="section-title">Hukum Mad (Panjang)</h2>
+            </div>
+            
+            <!-- MAD TABI'I -->
+            <div class="mad-card">
+                <h3 class="mad-title">1️⃣ Mad Tabi'i (المد الطبيعي)</h3>
+                
+                <div class="info-row">
+                    <span class="info-icon">💡</span>
+                    <div class="info-content">
+                        <div class="info-label">Syarat</div>
+                        <div class="info-text">Huruf mad tidak bertemu hamzah/sukun</div>
+                    </div>
+                </div>
+                
+                <div class="info-row">
+                    <span class="info-icon">⏱️</span>
+                    <div class="info-content">
+                        <div class="info-label">Durasi</div>
+                        <span class="duration-badge">2 Harakat</span>
+                        <div class="info-text" style="margin-top: 0.5rem;">1 alif / 2 ketukan</div>
+                    </div>
+                </div>
+                
+                <div class="example-box">
+                    <span class="example-label">💡 Contoh</span>
+                    <div class="example-arab">قَالَ - قِيلَ - يَقُولُ</div>
+                    <div class="example-latin">Qaala - Qiila - Yaquulu</div>
+                </div>
+            </div>
+            
+            <!-- MAD WAJIB MUTTASHIL -->
+            <div class="mad-card">
+                <h3 class="mad-title">2️⃣ Mad Wajib Muttashil (المد الواجب المتصل)</h3>
+                
+                <div class="info-row">
+                    <span class="info-icon">💡</span>
+                    <div class="info-content">
+                        <div class="info-label">Syarat</div>
+                        <div class="info-text">Huruf mad bertemu hamzah dalam satu kata</div>
+                    </div>
+                </div>
+                
+                <div class="info-row">
+                    <span class="info-icon">⏱️</span>
+                    <div class="info-content">
+                        <div class="info-label">Durasi</div>
+                        <span class="duration-badge">4-5 Harakat</span>
+                        <div class="info-text" style="margin-top: 0.5rem;">Wajib dipanjangkan</div>
+                    </div>
+                </div>
+                
+                <div class="example-box">
+                    <span class="example-label">💡 Contoh</span>
+                    <div class="example-arab">جَآءَ - السَّمَآءِ - شَآءَ</div>
+                    <div class="example-latin">Jaa'a - As-samaa'i - Syaa'a</div>
+                </div>
+            </div>
+            
+            <!-- MAD JAIZ MUNFASHIL -->
+            <div class="mad-card">
+                <h3 class="mad-title">3️⃣ Mad Jaiz Munfashil (المد الجائز المنفصل)</h3>
+                
+                <div class="info-row">
+                    <span class="info-icon">💡</span>
+                    <div class="info-content">
+                        <div class="info-label">Syarat</div>
+                        <div class="info-text">Huruf mad bertemu hamzah di kata berbeda</div>
+                    </div>
+                </div>
+                
+                <div class="info-row">
+                    <span class="info-icon">⏱️</span>
+                    <div class="info-content">
+                        <div class="info-label">Durasi</div>
+                        <span class="duration-badge">2 Harakat</span>
+                        <span class="duration-badge">4 Harakat</span>
+                        <span class="duration-badge">5 Harakat</span>
+                        <div class="info-text" style="margin-top: 0.5rem;">Fleksibel</div>
+                    </div>
+                </div>
+                
+                <div class="example-box">
+                    <span class="example-label">💡 Contoh</span>
+                    <div class="example-arab">بِمَآ أُنزِلَ - يَآ أَيُّهَا</div>
+                    <div class="example-latin">Bimaa unzila - Yaa ayyuhaa</div>
+                </div>
+            </div>
+            
+            <!-- MAD LAZIM -->
+            <div class="mad-card">
+                <h3 class="mad-title">4️⃣ Mad Lazim (المد اللازم)</h3>
+                
+                <div class="info-row">
+                    <span class="info-icon">⏱️</span>
+                    <div class="info-content">
+                        <div class="info-label">Durasi</div>
+                        <span class="duration-badge">6 Harakat</span>
+                        <div class="info-text" style="margin-top: 0.5rem;">Wajib dipanjangkan</div>
+                    </div>
+                </div>
+                
+                <div style="margin: 1.5rem 0;">
+                    <h4 style="color: #a78bfa; margin-bottom: 1rem;">a. Mad Lazim Kilmi (dalam satu kata):</h4>
+                    <ul style="color: #cbd5e1; list-style-position: inside;">
+                        <li style="margin: 0.5rem 0;"><strong>Mutsaqqal (dengan tasydid):</strong> <span class="example-arab" style="font-size: 1.5em; display: inline;">آلْآنَ - الضَّآلِّينَ</span></li>
+                        <li style="margin: 0.5rem 0;"><strong>Mukhaffaf (tanpa tasydid):</strong> <span class="example-arab" style="font-size: 1.5em; display: inline;">آلْـَٔـٰنَ</span></li>
+                    </ul>
+                </div>
+                
+                <div style="margin: 1.5rem 0;">
+                    <h4 style="color: #a78bfa; margin-bottom: 1rem;">b. Mad Lazim Harfi (pada huruf hijaiyah):</h4>
+                    <p style="color: #94a3b8; margin-bottom: 1rem;">Terjadi di awal surah pada huruf-huruf fawatihus suwar</p>
+                    
+                    <div class="example-box">
+                        <span class="example-label">💡 Contoh</span>
+                        <div class="example-arab">الم - المص - طسم - طه - يس</div>
+                        <div class="example-latin">Alif Laam Miim - Alif Laam Miim Shaad - Thaa Siin Miim</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- MAD 'ARIDH LISSUKUN -->
+            <div class="mad-card">
+                <h3 class="mad-title">5️⃣ Mad 'Aridh Lissukun (المد العارض للسكون)</h3>
+                
+                <div class="info-row">
+                    <span class="info-icon">💡</span>
+                    <div class="info-content">
+                        <div class="info-label">Syarat</div>
+                        <div class="info-text">Huruf mad bertemu sukun karena waqaf (berhenti)</div>
+                    </div>
+                </div>
+                
+                <div class="info-row">
+                    <span class="info-icon">⏱️</span>
+                    <div class="info-content">
+                        <div class="info-label">Durasi</div>
+                        <span class="duration-badge">2 Harakat</span>
+                        <span class="duration-badge">4 Harakat</span>
+                        <span class="duration-badge">6 Harakat</span>
+                        <div class="info-text" style="margin-top: 0.5rem;">Boleh pendek, sedang, atau panjang</div>
+                    </div>
+                </div>
+                
+                <div class="example-box">
+                    <span class="example-label">💡 Contoh</span>
+                    <div class="example-arab">الْعَالَمِينَ - الرَّحِيمِ</div>
+                    <div class="example-latin">Al-'aalamiin - Ar-rahiim (saat waqaf)</div>
+                </div>
+            </div>
+            
+            <!-- MAD IWADH -->
+            <div class="mad-card">
+                <h3 class="mad-title">6️⃣ Mad Iwadh (مد العوض)</h3>
+                
+                <div class="info-row">
+                    <span class="info-icon">💡</span>
+                    <div class="info-content">
+                        <div class="info-label">Syarat</div>
+                        <div class="info-text">Tanwin fathah (ً) saat waqaf berubah menjadi alif</div>
+                    </div>
+                </div>
+                
+                <div class="info-row">
+                    <span class="info-icon">⏱️</span>
+                    <div class="info-content">
+                        <div class="info-label">Durasi</div>
+                        <span class="duration-badge">2 Harakat</span>
+                    </div>
+                </div>
+                
+                <div class="example-box">
+                    <span class="example-label">💡 Contoh</span>
+                    <div class="example-arab">عَلِيمًا → عَلِيمَا</div>
+                    <div class="example-latin">'Aliiman → 'Aliimaa (saat waqaf)</div>
+                </div>
+                
+                <div class="example-box">
+                    <span class="example-label">💡 Contoh</span>
+                    <div class="example-arab">حَكِيمًا → حَكِيمَا</div>
+                    <div class="example-latin">Hakiiman → Hakiimaa (saat waqaf)</div>
+                </div>
+            </div>
+            
+            <!-- MAD SHILAH -->
+            <div class="mad-card">
+                <h3 class="mad-title">7️⃣ Mad Shilah (مد الصلة)</h3>
+                
+                <div style="margin: 1.5rem 0;">
+                    <h4 style="color: #a78bfa; margin-bottom: 1rem;">a. Shilah Qashirah (Pendek):</h4>
+                    
+                    <div class="info-row">
+                        <span class="info-icon">💡</span>
+                        <div class="info-content">
+                            <div class="info-label">Syarat</div>
+                            <div class="info-text">Ha dhamir (هِ - هُ) diantara 2 huruf hidup</div>
+                        </div>
+                    </div>
+                    
+                    <div class="info-row">
+                        <span class="info-icon">⏱️</span>
+                        <div class="info-content">
+                            <div class="info-label">Durasi</div>
+                            <span class="duration-badge">2 Harakat</span>
+                        </div>
+                    </div>
+                    
+                    <div class="example-box">
+                        <span class="example-label">💡 Contoh</span>
+                        <div class="example-arab">لَهُ مَا - بِهِ الْأَسْمَآءُ</div>
+                        <div class="example-latin">Lahu maa - Bihil asmaa'u</div>
+                    </div>
+                </div>
+                
+                <div style="margin: 1.5rem 0;">
+                    <h4 style="color: #a78bfa; margin-bottom: 1rem;">b. Shilah Thawilah (Panjang):</h4>
+                    
+                    <div class="info-row">
+                        <span class="info-icon">💡</span>
+                        <div class="info-content">
+                            <div class="info-label">Syarat</div>
+                            <div class="info-text">Ha dhamir bertemu hamzah</div>
+                        </div>
+                    </div>
+                    
+                    <div class="info-row">
+                        <span class="info-icon">⏱️</span>
+                        <div class="info-content">
+                            <div class="info-label">Durasi</div>
+                            <span class="duration-badge">4-5 Harakat</span>
+                        </div>
+                    </div>
+                    
+                    <div class="example-box">
+                        <span class="example-label">💡 Contoh</span>
+                        <div class="example-arab">مَالَهُۥٓ أَخْلَدَهُۥ</div>
+                        <div class="example-latin">Maalahu akhladahu</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- MAD LAYYIN -->
+            <div class="mad-card">
+                <h3 class="mad-title">8️⃣ Mad Layyin (مد اللين)</h3>
+                
+                <div class="info-row">
+                    <span class="info-icon">💡</span>
+                    <div class="info-content">
+                        <div class="info-label">Syarat</div>
+                        <div class="info-text">Huruf و atau ي sukun setelah fathah, bertemu sukun waqaf</div>
+                    </div>
+                </div>
+                
+                <div class="info-row">
+                    <span class="info-icon">⏱️</span>
+                    <div class="info-content">
+                        <div class="info-label">Durasi</div>
+                        <span class="duration-badge">2-4 Harakat</span>
+                        <div class="info-text" style="margin-top: 0.5rem;">Boleh pendek atau sedang</div>
+                    </div>
+                </div>
+                
+                <div class="example-box">
+                    <span class="example-label">💡 Contoh</span>
+                    <div class="example-arab">خَوْفٌ - بَيْتٍ - قُرَيْشٍ</div>
+                    <div class="example-latin">Khaufun - Baitin - Quraisyin (saat waqaf)</div>
+                </div>
+            </div>
+            
+            <!-- MAD FARQ -->
+            <div class="mad-card">
+                <h3 class="mad-title">9️⃣ Mad Farq (مد الفرق)</h3>
+                
+                <div class="info-row">
+                    <span class="info-icon">💡</span>
+                    <div class="info-content">
+                        <div class="info-label">Fungsi</div>
+                        <div class="info-text">Membedakan antara kalimat istifham (pertanyaan) dan khabar (berita)</div>
+                    </div>
+                </div>
+                
+                <div class="info-row">
+                    <span class="info-icon">⏱️</span>
+                    <div class="info-content">
+                        <div class="info-label">Durasi</div>
+                        <span class="duration-badge">6 Harakat</span>
+                    </div>
+                </div>
+                
+                <div class="example-box">
+                    <span class="example-label">💡 Contoh</span>
+                    <div class="example-arab">ءَآللّٰهُ - ءَآلذَّكَرَيْنِ</div>
+                    <div class="example-latin">A-aallaahu - A-adz-dzakaraini</div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Footer -->
+        <div style="text-align: center; padding: 3rem 0; color: #64748b;">
+            <p style="font-size: 2em;"><strong>وَاللَّهُ أَعْلَمُ بِالصَّوَابِ</strong></p>
+            <p style="margin-top: 10px; font-size: 1em;">Wallahu A'lam Bishawab</p>
+            <p style="font-size: 1em; opacity: 0.8;">(Hanya Allah yang lebih mengetahui kebenaran yang sesungguhnya)</p>
+            <p style="margin-top: 40px; font-size: 1.1em; opacity: 0.9; font-style: italic;">Semoga Bermanfaat dalam Menguasai Ilmu Tajwid</p>
+        </div>
+    </main>
+
+    <a href="#hero" class="scroll-top">↑</a>
+    
+    <script>
+        // Mobile menu toggle
+        const menuToggle = document.getElementById('menuToggle');
+        const sidebar = document.getElementById('sidebar');
+        
+        menuToggle.addEventListener('click', () => {
+            sidebar.classList.toggle('active');
+            menuToggle.classList.toggle('active');
+        });
+        
+        // Close sidebar when clicking nav links on mobile
+        const navLinks = document.querySelectorAll('.nav-link');
+        navLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                if (window.innerWidth <= 1024) {
+                    sidebar.classList.remove('active');
+                    menuToggle.classList.remove('active');
+                }
+            });
+        });
+        
+        // Smooth scroll
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+        
+        // Intersection Observer for animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+        
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+        
+        // Apply animation to elements
+        document.querySelectorAll('.hukum-item, .mad-card, .card').forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(30px)';
+            el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+            observer.observe(el);
+        });
+        
+        // Active nav link on scroll
+        const sections = document.querySelectorAll('.section');
+        const navItems = document.querySelectorAll('.nav-link');
+        
+        window.addEventListener('scroll', () => {
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                const sectionHeight = section.clientHeight;
+                if (scrollY >= sectionTop - 200) {
+                    current = section.getAttribute('id');
+                }
+            });
+            
+            navItems.forEach(link => {
+                link.style.background = '';
+                link.style.color = '#94a3b8';
+                if (link.getAttribute('href') === `#${current}`) {
+                    link.style.background = 'rgba(14, 165, 233, 0.1)';
+                    link.style.color = '#0ea5e9';
+                }
+            });
+        });
+    </script>
+</body>
+</html>
